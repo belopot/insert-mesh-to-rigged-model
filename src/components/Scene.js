@@ -1,8 +1,7 @@
 import * as THREE from "three"
-import React, { Suspense } from "react"
+import React, { Suspense, useRef } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import Model from "./Model"
-import Head from "./Head"
 
 function Rig() {
   return useFrame((state) => {
@@ -32,7 +31,6 @@ export default function Scene() {
       <group position={[0, -1, 0]}>
         <Suspense fallback={null}>
           <Model />
-          <Head position={[1, 1.7, 0.5]} />
         </Suspense>
       </group>
       <Rig />

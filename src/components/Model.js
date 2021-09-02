@@ -5,9 +5,11 @@ all actions and sets up a THREE.AnimationMixer for it so that you don't have to.
 All of the assets actions, action-names and clips are available in its output. 
 */
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useGLTF, useTexture, useAnimations } from "@react-three/drei"
 import { a, useSpring } from "@react-spring/three"
+import { useSelector } from "react-redux"
+import Head from "./Head"
 
 export default function Model(props) {
   // Fetch model and a separate texture
@@ -19,9 +21,17 @@ export default function Model(props) {
   const [hovered, setHovered] = useState(false)
   const [index, setIndex] = useState(4)
   // Animate the selection halo
-  const { color, scale } = useSpring({ scale: hovered ? [1.15, 1.15, 1] : [1, 1, 1], color: hovered ? "hotpink" : "aquamarine" })
+  const { color, scale } = useSpring({
+    scale: hovered ? [1.15, 1.15, 1] : [1, 1, 1],
+    color: hovered ? "hotpink" : "aquamarine"
+  })
+  const headRef = useRef()
+
   // Change cursor on hover-state
-  useEffect(() => void (document.body.style.cursor = hovered ? "pointer" : "auto"), [hovered])
+  useEffect(
+    () => void (document.body.style.cursor = hovered ? "pointer" : "auto"),
+    [hovered]
+  )
   // Change animation when the index changes
   useEffect(() => {
     // Reset and fade in animation after an index has been changed
@@ -52,6 +62,9 @@ export default function Model(props) {
         <circleBufferGeometry args={[1, 64]} />
         <a.meshStandardMaterial color={color} />
       </a.mesh>
+      <group ref={headRef} position={[1, 1.7, 0.5]}>
+        <Head />
+      </group>
     </group>
   )
 }
