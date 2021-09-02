@@ -1,39 +1,39 @@
-import * as THREE from "three"
-import React, { Suspense, useRef } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
+import React, { createContext, Suspense } from "react"
+import { Canvas } from "@react-three/fiber"
 import Model from "./Model"
+import { useSelector } from "react-redux"
+import { OrbitControls } from "@react-three/drei"
 
-function Rig() {
-  return useFrame((state) => {
-    state.camera.position.x = THREE.MathUtils.lerp(
-      state.camera.position.x,
-      1 + state.mouse.x / 4,
-      0.075
-    )
-    state.camera.position.y = THREE.MathUtils.lerp(
-      state.camera.position.y,
-      1.5 + state.mouse.y / 4,
-      0.075
-    )
-  })
-}
+export const CanvasContext = createContext(null)
 
 export default function Scene() {
+  const isAttach = useSelector((state) => state.app.isAttach)
   return (
-    <Canvas concurrent shadowMap camera={{ position: [1, 1.5, 2.5], fov: 50 }}>
-      <ambientLight />
-      <directionalLight
-        position={[-5, 5, 5]}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-      />
-      <group position={[0, -1, 0]}>
-        <Suspense fallback={null}>
-          <Model />
-        </Suspense>
-      </group>
-      <Rig />
-    </Canvas>
+    <CanvasContext.Provider value={{ isAttach: isAttach }}>
+      <CanvasContext.Consumer>
+        {(value) => (
+          <Canvas
+            concurrent
+            shadowMap
+            camera={{ position: [1, 1.5, 2.5], fov: 50 }}>
+            <ambientLight />
+            <directionalLight
+              position={[-5, 5, 5]}
+              castShadow
+              shadow-mapSize-width={1024}
+              shadow-mapSize-height={1024}
+            />
+            <group position={[0, -1, 0]}>
+              <Suspense fallback={null}>
+                <CanvasContext.Provider value={value}>
+                  <Model />
+                </CanvasContext.Provider>
+              </Suspense>
+            </group>
+            <OrbitControls />
+          </Canvas>
+        )}
+      </CanvasContext.Consumer>
+    </CanvasContext.Provider>
   )
 }

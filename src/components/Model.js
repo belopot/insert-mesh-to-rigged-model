@@ -5,11 +5,12 @@ all actions and sets up a THREE.AnimationMixer for it so that you don't have to.
 All of the assets actions, action-names and clips are available in its output. 
 */
 
-import React, { useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import { useGLTF, useTexture, useAnimations } from "@react-three/drei"
-import { a, useSpring } from "@react-spring/three"
-import { useSelector } from "react-redux"
 import Head from "./Head"
+import { CanvasContext } from "./Scene"
+
+const HEAD_INIT_POSITION = [1, 1.7, 0.5]
 
 export default function Model(props) {
   // Fetch model and a separate texture
@@ -20,12 +21,27 @@ export default function Model(props) {
   // Hover and animation-index states
   const [hovered, setHovered] = useState(false)
   const [index, setIndex] = useState(4)
-  // Animate the selection halo
-  const { color, scale } = useSpring({
-    scale: hovered ? [1.15, 1.15, 1] : [1, 1, 1],
-    color: hovered ? "hotpink" : "aquamarine"
-  })
   const headRef = useRef()
+
+  const context = useContext(CanvasContext)
+
+  useEffect(() => {
+    if (context.isAttach) {
+      headRef.current.position.set(0, -8, 3.4)
+      headRef.current.scale.set(125, 125, 125)
+      ref.current.children[0].children[0].children[0].children[0].children[0].children[0].children[0].add(
+        headRef.current
+      )
+    } else {
+      headRef.current.position.set(
+        HEAD_INIT_POSITION[0],
+        HEAD_INIT_POSITION[1],
+        HEAD_INIT_POSITION[2]
+      )
+      headRef.current.scale.set(1, 1, 1)
+      ref.current.add(headRef.current)
+    }
+  }, [context])
 
   // Change cursor on hover-state
   useEffect(
@@ -58,11 +74,7 @@ export default function Model(props) {
           <meshStandardMaterial map={texture} map-flipY={false} skinning />
         </skinnedMesh>
       </group>
-      <a.mesh receiveShadow position={[0, 1, -1]} scale={scale}>
-        <circleBufferGeometry args={[1, 64]} />
-        <a.meshStandardMaterial color={color} />
-      </a.mesh>
-      <group ref={headRef} position={[1, 1.7, 0.5]}>
+      <group ref={headRef} position={HEAD_INIT_POSITION}>
         <Head />
       </group>
     </group>
